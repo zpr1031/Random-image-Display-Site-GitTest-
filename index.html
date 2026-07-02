@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fragments of Light — Photo Exhibition</title>
+  <style>
+    :root {
+      --wall: #1c1a17;
+      --wall-light: #2a2620;
+      --floor: #0e0d0b;
+      --frame: #f5f0e8;
+      --frame-border: #3d3830;
+      --mat: #faf8f4;
+      --spotlight: rgba(255, 236, 200, 0.07);
+      --text: #e8e2d8;
+      --muted: #9a9285;
+      --accent: #c9a96e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Georgia", "Times New Roman", serif;
+      background: var(--floor);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .exhibition {
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% 0%, var(--spotlight), transparent),
+        linear-gradient(180deg, var(--wall-light) 0%, var(--wall) 40%, var(--floor) 100%);
+    }
+
+    header {
+      text-align: center;
+      padding: 56px 24px 40px;
+      border-bottom: 1px solid rgba(201, 169, 110, 0.15);
+    }
+
+    .exhibition-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .meta span::before {
+      content: "·";
+      margin-right: 24px;
+      opacity: 0.4;
+    }
+
+    .meta span:first-child::before {
+      display: none;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .refresh-btn {
+      font-family: inherit;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 12px 28px;
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid rgba(201, 169, 110, 0.4);
+      cursor: pointer;
+      transition: background 0.25s, color 0.25s;
+    }
+
+    .refresh-btn:hover {
+      background: var(--accent);
+      color: var(--wall);
+    }
+
+    .gallery-room {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 16px 32px 80px;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 48px 36px;
+    }
+
+    .artwork {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .frame {
+      position: relative;
+      background: var(--mat);
+      padding: 14px;
+      border: 1px solid var(--frame-border);
+      box-shadow:
+        0 2px 0 rgba(255, 255, 255, 0.06) inset,
+        0 20px 40px rgba(0, 0, 0, 0.45),
+        0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    .frame::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border: 3px solid var(--frame);
+      pointer-events: none;
+    }
+
+    .frame:hover {
+      transform: translateY(-6px);
+      box-shadow:
+        0 2px 0 rgba(255, 255, 255, 0.08) inset,
+        0 32px 60px rgba(0, 0, 0, 0.55),
+        0 0 40px rgba(255, 236, 200, 0.06);
+    }
+
+    .frame-inner {
+      width: 300px;
+      height: 300px;
+      overflow: hidden;
+      background: #111;
+      position: relative;
+    }
+
+    .frame-inner img {
+      display: block;
+      width: 300px;
+      height: 300px;
+      object-fit: cover;
+      transition: opacity 0.4s;
+    }
+
+    .frame-inner img.loading {
+      opacity: 0;
+    }
+
+    .frame-inner .placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1a1815;
+      color: var(--muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+    }
+
+    .caption {
+      margin-top: 18px;
+      text-align: center;
+      max-width: 300px;
+    }
+
+    .caption .title {
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+
+    .caption .artist {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .caption .number {
+      font-size: 0.65rem;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      margin-top: 6px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 24px 56px;
+      border-top: 1px solid rgba(201, 169, 110, 0.1);
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    @media (max-width: 640px) {
+      .gallery-room {
+        padding: 8px 16px 60px;
+      }
+
+      .gallery-grid {
+        gap: 36px 20px;
+      }
+
+      .frame-inner,
+      .frame-inner img {
+        width: min(300px, calc(100vw - 80px));
+        height: min(300px, calc(100vw - 80px));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="exhibition">
+    <header>
+      <p class="exhibition-label">Virtual Photo Exhibition</p>
+      <h1>Fragments of Light</h1>
+      <p class="subtitle">빛과 형태가 만나는 순간들 — 30점의 랜덤 작품</p>
+      <div class="meta">
+        <span>2026</span>
+        <span>30 Works</span>
+        <span>300 × 300 px</span>
+        <span>Picsum Collection</span>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <button class="refresh-btn" id="refreshBtn" type="button">전시 교체</button>
+    </div>
+
+    <section class="gallery-room">
+      <div class="gallery-grid" id="gallery"></div>
+    </section>
+
+    <footer>
+      Images provided by <a href="https://picsum.photos" style="color: var(--accent);">Lorem Picsum</a>
+    </footer>
+  </div>
+
+  <script>
+    const IMAGE_COUNT = 30;
+    const IMAGE_SIZE = 300;
+    const API_BASE = `https://picsum.photos/${IMAGE_SIZE}/${IMAGE_SIZE}`;
+
+    const titles = [
+      "고요한 아침", "빛의 잔향", "그림자의 노래", "흐릿한 기억", "창가의 풍경",
+      "잔잔한 물결", "황혼의 색", "무제 #7", "숨겨진 길", "겨울의 숨",
+      "먼 곳에서", "시간의 층", "푸른 순간", "나뭇잎 사이", "도시의 밤",
+      "고요 II", "빛나는 먼지", "안개 너머", "작은 우주", "침묵의 정원",
+      "따뜻한 회색", "지나간 바람", "새벽 이전", "반짝이는 공기", "깊은 호수",
+      "잊혀진 계절", "빛의 조각", "고요 III", "마지막 색", "영원한 순간",
+    ];
+
+    const artists = [
+      "Anonymous", "Studio Lumen", "K. Mori", "Field Notes", "Light Archive",
+      "Unknown Artist", "Collective Zero", "Atelier Nord", "Open Lens", "Quiet Room",
+    ];
+
+    const gallery = document.getElementById("gallery");
+    const refreshBtn = document.getElementById("refreshBtn");
+
+    function buildUrl(index, seed) {
+      return `${API_BASE}?random=${seed}-${index}`;
+    }
+
+    function createArtwork(index, seed) {
+      const artwork = document.createElement("article");
+      artwork.className = "artwork";
+      artwork.style.animationDelay = `${index * 0.04}s`;
+
+      const number = String(index + 1).padStart(2, "0");
+      const title = titles[index % titles.length];
+      const artist = artists[index % artists.length];
+
+      artwork.innerHTML = `
+        <div class="frame">
+          <div class="frame-inner">
+            <div class="placeholder">LOADING</div>
+            <img class="loading" src="${buildUrl(index, seed)}" alt="${title}">
+          </div>
+        </div>
+        <div class="caption">
+          <p class="title">${title}</p>
+          <p class="artist">${artist}</p>
+          <p class="number">No. ${number}</p>
+        </div>
+      `;
+
+      const img = artwork.querySelector("img");
+      const placeholder = artwork.querySelector(".placeholder");
+
+      img.onload = () => {
+        img.classList.remove("loading");
+        placeholder.remove();
+      };
+
+      img.onerror = () => {
+        placeholder.textContent = "FAILED";
+      };
+
+      return artwork;
+    }
+
+    function renderGallery() {
+      const seed = Date.now();
+      gallery.innerHTML = "";
+
+      for (let i = 0; i < IMAGE_COUNT; i++) {
+        gallery.appendChild(createArtwork(i, seed));
+      }
+    }
+
+    refreshBtn.addEventListener("click", renderGallery);
+    renderGallery();
+  </script>
+</body>
+</html>
